@@ -1,0 +1,121 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sf-hallucinate"
+version = "1.0.0"
+description = "Faithfulness scorer for LLM outputs — hallucination risk detection built on the SpanForge EvalScorer protocol"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "sf-hallucinate contributors" }]
+keywords = [
+    "llm",
+    "hallucination",
+    "faithfulness",
+    "eval",
+    "spanforge",
+    "ai-governance",
+    "rag",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
+requires-python = ">=3.9"
+dependencies = ["spanforge>=2.0.3"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pytest-asyncio>=0.23",
+    "hypothesis>=6.100",
+    "ruff>=0.3",
+    "mypy>=1.9",
+]
+embedding = [
+    "sentence-transformers>=2.2",
+]
+all = [
+    "sentence-transformers>=2.2",
+]
+
+[project.scripts]
+sf-hallucinate = "sf_hallucinate.cli:main"
+
+[project.entry-points."spanforge.eval_scorers"]
+faithfulness = "sf_hallucinate.eval:FaithfulnessScorer"
+
+[project.urls]
+Homepage = "https://github.com/veerarag1973/sf-hallucinate"
+Documentation = "https://github.com/veerarag1973/sf-hallucinate/blob/main/docs/index.md"
+"Bug Tracker" = "https://github.com/veerarag1973/sf-hallucinate/issues"
+Changelog = "https://github.com/veerarag1973/sf-hallucinate/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sf_hallucinate = ["py.typed"]
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = [
+    "--cov=sf_hallucinate",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-fail-under=90",
+    "-v",
+]
+
+[tool.coverage.run]
+source = ["sf_hallucinate"]
+branch = true
+omit = ["src/sf_hallucinate/__main__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+    "\\.\\.\\.",
+]
+
+# ---------------------------------------------------------------------------
+# ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+src = ["src"]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "ANN", "B", "C4", "PIE", "RUF"]
+ignore = ["ANN101", "ANN102", "ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN", "S101"]
+
+# ---------------------------------------------------------------------------
+# mypy
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
